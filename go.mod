@@ -1,4 +1,4 @@
-module github.com/blues/jsonata-go
+module github.com/stepzen-dev/jsonata-go
 
 go 1.20
 

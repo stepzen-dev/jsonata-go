@@ -12,9 +12,9 @@ import (
 	"time"
 	"unicode"
 
-	"github.com/blues/jsonata-go/jlib"
-	"github.com/blues/jsonata-go/jparse"
-	"github.com/blues/jsonata-go/jtypes"
+	"github.com/stepzen-dev/jsonata-go/jlib"
+	"github.com/stepzen-dev/jsonata-go/jparse"
+	"github.com/stepzen-dev/jsonata-go/jtypes"
 )
 
 var (
