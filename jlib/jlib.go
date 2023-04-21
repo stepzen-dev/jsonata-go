@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/blues/jsonata-go/jtypes"
+	"github.com/stepzen-dev/jsonata-go/jtypes"
 )
 
 var typeBool = reflect.TypeOf((*bool)(nil)).Elem()

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"log"
 
-	jsonata "github.com/blues/jsonata-go"
+	jsonata "github.com/stepzen-dev/jsonata-go"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
