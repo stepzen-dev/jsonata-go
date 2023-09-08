@@ -20,6 +20,7 @@ import (
 
 	"github.com/stepzen-dev/jsonata-go/jparse"
 	"github.com/stepzen-dev/jsonata-go/jtypes"
+	"github.com/stretchr/testify/require"
 )
 
 type testCase struct {
@@ -300,8 +301,12 @@ func TestPaths2(t *testing.T) {
 			Output:     map[string]any{"misc": nil},
 		},
 		{
-			Expression: `[4, null, Other.Misc]`,
-			Output:     []any{4, nil, nil},
+			Expression: `["abc", null, Other.Misc]`,
+			Output:     []any{"abc", nil, nil},
+		},
+		{
+			Expression: `null`,
+			Output:     nil,
 		},
 	})
 }
@@ -2796,7 +2801,6 @@ func TestNullExpressions(t *testing.T) {
 			Output: []interface{}{
 				nil,
 			},
-			Skip: true, // uses the wrong kind of nil (*interface{}(nil) instead of plain nil)?
 		},
 		{
 			Expression: "[null, null]",
@@ -2804,7 +2808,6 @@ func TestNullExpressions(t *testing.T) {
 				nil,
 				nil,
 			},
-			Skip: true, // uses the wrong kind of nil (*interface{}(nil) instead of plain nil)?
 		},
 		{
 			Expression: "$not(null)",
@@ -2825,7 +2828,6 @@ func TestNullExpressions(t *testing.T) {
 				"false": false,
 				"null":  nil,
 			},
-			Skip: true, // uses the wrong kind of nil (*interface{}(nil) instead of plain nil)?
 		},
 	})
 }
@@ -8115,4 +8117,12 @@ func readJSON(filename string) interface{} {
 	}
 
 	return dest
+}
+
+func TestNullValue(t *testing.T) {
+	nv := nullValue()
+	require.True(t, nv.IsValid())
+	require.True(t, nv.IsNil())
+	require.True(t, nv.CanInterface())
+	require.True(t, nv.Interface() == nil)
 }

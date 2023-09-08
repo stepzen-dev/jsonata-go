@@ -111,10 +111,13 @@ func evalBoolean(node *jparse.BooleanNode, data reflect.Value, env *environment)
 	return reflect.ValueOf(node.Value), nil
 }
 
-var null *interface{}
+// return a value that corresponds to any(nil).
+func nullValue() reflect.Value {
+	return reflect.ValueOf([]any{nil}).Index(0)
+}
 
 func evalNull(node *jparse.NullNode, data reflect.Value, env *environment) (reflect.Value, error) {
-	return reflect.ValueOf(null), nil
+	return nullValue(), nil
 }
 
 func evalRegex(node *jparse.RegexNode, data reflect.Value, env *environment) (reflect.Value, error) {
@@ -288,7 +291,7 @@ func evalOverSequence(node jparse.Node, seq *sequence, env *environment) ([]refl
 
 	for i, N := 0, len(seq.values); i < N; i++ {
 
-		res, err := eval(node, reflect.ValueOf(seq.values[i]), env)
+		res, err := eval(node, seq.valueAt(i), env)
 		if err != nil {
 			return nil, err
 		}
@@ -1128,12 +1131,19 @@ func eq(lhs, rhs reflect.Value) bool {
 		return reflect.DeepEqual(lhs.Interface(), rhs.Interface())
 	}
 
-	// All other types (e.g. functions) are
+	// All other valid and comparable values (e.g. functions) are
 	// compared directly. Two functions with the same contents
 	// are not considered equal unless they're the same
 	// physical object in memory.
 
-	return lhs == rhs
+	if !lhs.IsValid() || !rhs.IsValid() {
+		return false
+	}
+
+	if !lhs.CanInterface() || !rhs.CanInterface() {
+		return false
+	}
+	return lhs.Interface() == rhs.Interface()
 }
 
 func lt(lhs, rhs reflect.Value) bool {
@@ -1335,10 +1345,18 @@ func (s sequence) Value() reflect.Value {
 	case n == 0:
 		return undefined
 	case n == 1 && !s.keepSingletons:
-		return reflect.ValueOf(s.values[0])
+		return s.valueAt(0)
 	default:
 		return reflect.ValueOf(s.values)
 	}
+}
+
+func (s sequence) valueAt(idx int) reflect.Value {
+	v := s.values[idx]
+	if v == nil {
+		return nullValue()
+	}
+	return reflect.ValueOf(v)
 }
 
 var (
