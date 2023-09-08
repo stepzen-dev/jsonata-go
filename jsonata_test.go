@@ -285,12 +285,23 @@ func TestPaths(t *testing.T) {
 }
 
 func TestPaths2(t *testing.T) {
-
 	runTestCases(t, testdata.address, []*testCase{
 		{
 			Expression: "Other.Misc",
 			Output:     nil,
-			Skip:       true, // returns ErrUndefined
+		},
+		{
+			Expression: "Other.XXX", // no such key
+			Output:     nil,
+			Error:      ErrUndefined,
+		},
+		{
+			Expression: `{"misc": Other.Misc}`,
+			Output:     map[string]any{"misc": nil},
+		},
+		{
+			Expression: `[4, null, Other.Misc]`,
+			Output:     []any{4, nil, nil},
 		},
 	})
 }
