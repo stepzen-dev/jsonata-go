@@ -560,6 +560,10 @@ func testGoCallable(t *testing.T, tests []goCallableTest) {
 		if argc := len(test.Args); argc > 0 {
 			argv = make([]reflect.Value, argc)
 			for i := range argv {
+				if test.Args[i] == nil {
+					argv[i] = nullValue()
+					continue
+				}
 				argv[i] = reflect.ValueOf(test.Args[i])
 			}
 		}
@@ -1402,7 +1406,7 @@ func TestLambdaCallable(t *testing.T) {
 				},
 			},
 			Args: []interface{}{
-				null,
+				nil,
 			},
 			Error: &ArgTypeError{
 				Func:  "boolean2",
@@ -1811,48 +1815,55 @@ func testLambdaCallable(t *testing.T, tests []lambdaCallableTest) {
 
 	for i, test := range tests {
 
-		env := newEnvironment(nil, len(test.Vars))
-		for name, v := range test.Vars {
-			env.bind(name, reflect.ValueOf(v))
-		}
+		t.Run(test.Name, func(t *testing.T) {
 
-		f := &lambdaCallable{
-			callableName: callableName{
-				name: test.Name,
-			},
-			body:       test.Body,
-			paramNames: test.ParamNames,
-			typed:      test.Typed,
-			params:     test.Params,
-			env:        env,
-			context:    reflect.ValueOf(test.Context),
-		}
-
-		var args []reflect.Value
-		for _, arg := range test.Args {
-			args = append(args, reflect.ValueOf(arg))
-		}
-
-		v, err := f.Call(args)
-
-		var output interface{}
-		if v.IsValid() && v.CanInterface() {
-			output = v.Interface()
-		}
-
-		if test.Undefined {
-			if v != undefined {
-				t.Errorf("lambda %d: expected undefined, got %v", i+1, v)
+			env := newEnvironment(nil, len(test.Vars))
+			for name, v := range test.Vars {
+				env.bind(name, reflect.ValueOf(v))
 			}
-		} else {
-			if !reflect.DeepEqual(test.Output, output) {
-				t.Errorf("lambda %d: expected %v, got %v", i+1, test.Output, output)
-			}
-		}
 
-		if !reflect.DeepEqual(test.Error, err) {
-			t.Errorf("lambda %d: expected error %v, got %v", i+1, test.Error, err)
-		}
+			f := &lambdaCallable{
+				callableName: callableName{
+					name: test.Name,
+				},
+				body:       test.Body,
+				paramNames: test.ParamNames,
+				typed:      test.Typed,
+				params:     test.Params,
+				env:        env,
+				context:    reflect.ValueOf(test.Context),
+			}
+
+			var args []reflect.Value
+			for _, arg := range test.Args {
+				if arg == nil {
+					args = append(args, nullValue())
+					continue
+				}
+				args = append(args, reflect.ValueOf(arg))
+			}
+
+			v, err := f.Call(args)
+
+			var output interface{}
+			if v.IsValid() && v.CanInterface() {
+				output = v.Interface()
+			}
+
+			if test.Undefined {
+				if v != undefined {
+					t.Errorf("lambda %d: expected undefined, got %v", i+1, v)
+				}
+			} else {
+				if !reflect.DeepEqual(test.Output, output) {
+					t.Errorf("lambda %d: expected %v, got %v", i+1, test.Output, output)
+				}
+			}
+
+			if !reflect.DeepEqual(test.Error, err) {
+				t.Errorf("lambda %d: expected error %v, got %v", i+1, test.Error, err)
+			}
+		})
 	}
 }
 

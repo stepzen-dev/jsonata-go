@@ -75,7 +75,7 @@ func TestEvalNull(t *testing.T) {
 	testEvalTestCases(t, []evalTestCase{
 		{
 			Input:  &jparse.NullNode{},
-			Output: null,
+			Output: nil,
 		},
 	})
 }
@@ -624,7 +624,7 @@ func TestEvalArray(t *testing.T) {
 				float64(1),
 				"two",
 				true,
-				null,
+				nil,
 			},
 		},
 		{
@@ -654,7 +654,7 @@ func TestEvalArray(t *testing.T) {
 					"two",
 					true,
 				},
-				null,
+				nil,
 			},
 		},
 		{

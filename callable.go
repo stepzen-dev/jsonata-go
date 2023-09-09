@@ -518,7 +518,6 @@ func (f *lambdaCallable) validateArgTypes(argv []reflect.Value) ([]reflect.Value
 	paramCount := len(f.params)
 
 	for i, arg := range argv {
-
 		// Don't type check undefined arguments.
 		if arg == undefined {
 			continue
