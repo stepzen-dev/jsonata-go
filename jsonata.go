@@ -232,7 +232,9 @@ func (e *Expr) newEnv(input reflect.Value) *environment {
 
 	tc := timeCallables(time.Now())
 
-	env := newEnvironment(baseEnv, len(tc)+len(e.registry)+1)
+	// create a new base environment (with the standard functions) to
+	// ensure each execution gets its own set of goCallables for functions.
+	env := newEnvironment(initBaseEnv(standardFunctions), len(tc)+len(e.registry)+1)
 
 	env.bind("$", input)
 	env.bindAll(tc)
