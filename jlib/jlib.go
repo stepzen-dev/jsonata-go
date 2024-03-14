@@ -50,6 +50,9 @@ func (s StringCallable) toInterface() interface{} {
 // TypeOf implements the jsonata $type function that returns the data type of
 // the argument
 func TypeOf(x interface{}) (string, error) {
+	if x == nil {
+		return "null", nil
+	}
 	v := reflect.ValueOf(x)
 	if jtypes.IsCallable(v) {
 		return "function", nil

@@ -8122,7 +8122,49 @@ func readJSON(filename string) interface{} {
 func TestNullValue(t *testing.T) {
 	nv := nullValue()
 	require.True(t, nv.IsValid())
+	require.True(t, nv.IsZero())
 	require.True(t, nv.IsNil())
 	require.True(t, nv.CanInterface())
 	require.True(t, nv.Interface() == nil)
+}
+
+func TestFuncType(t *testing.T) {
+	runTestCases(t, nil, []*testCase{
+		{
+			Expression: []string{
+				`$type("Hello World")`,
+			},
+			Output: "string",
+		},
+		{
+			Expression: []string{
+				`$type(true)`,
+			},
+			Output: "boolean",
+		},
+		{
+			Expression: []string{
+				`$type(2.3)`,
+			},
+			Output: "number",
+		},
+		{
+			Expression: []string{
+				`$type(3)`,
+			},
+			Output: "number",
+		},
+		{
+			Expression: []string{
+				`$type(null)`,
+			},
+			Output: "null",
+		},
+		{
+			Expression: []string{
+				`$type(a)`,
+			},
+			Error: ErrUndefined,
+		},
+	})
 }
