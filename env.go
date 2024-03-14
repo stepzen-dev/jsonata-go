@@ -65,7 +65,7 @@ var (
 	argCountEquals1 = jtypes.ArgCountEquals(1)
 )
 
-var baseEnv = initBaseEnv(map[string]Extension{
+var standardFunctions = map[string]Extension{
 
 	// String functions
 
@@ -385,7 +385,7 @@ var baseEnv = initBaseEnv(map[string]Extension{
 		UndefinedHandler:   nil,
 		EvalContextHandler: nil,
 	},
-})
+}
 
 func initBaseEnv(exts map[string]Extension) *environment {
 

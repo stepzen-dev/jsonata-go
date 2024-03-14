@@ -6,15 +6,18 @@ package jsonata
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"reflect"
 	"regexp"
 	"sort"
 	"strings"
+	"sync"
 	"testing"
 
 	"github.com/stepzen-dev/jsonata-go/jparse"
 	"github.com/stepzen-dev/jsonata-go/jtypes"
+	"github.com/stretchr/testify/assert"
 )
 
 var (
@@ -2760,4 +2763,30 @@ func TestCallableParamCount(t *testing.T) {
 			t.Errorf("%s: expected ParamCount %d, got %d", test.Callable.Name(), test.Count, count)
 		}
 	}
+}
+
+func TestConcurrentGoCallable(t *testing.T) {
+	const src = `$contains(/^DEF-/)`
+	n := 100
+	var wg sync.WaitGroup
+	for i := 0; i < n; i++ {
+		id := fmt.Sprintf("ABC-%d", i)
+		if i%3 == 0 {
+			id = fmt.Sprintf("DEF-%d", i)
+		}
+
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			result, err := MustCompile(src).Eval(id)
+			assert.NoError(t, err)
+
+			if strings.HasPrefix(id, "DEF-") {
+				assert.Equal(t, true, result)
+			} else {
+				assert.Equal(t, false, result)
+			}
+		}()
+	}
+	wg.Wait()
 }
