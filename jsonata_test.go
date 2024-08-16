@@ -8168,3 +8168,31 @@ func TestFuncType(t *testing.T) {
 		},
 	})
 }
+
+func TestFuncEval(t *testing.T) {
+	runTestCases(t, testdata.account, []*testCase{
+		{
+			Expression: `$eval("[1,2,3]")`,
+			Output:     []any{1.0, 2.0, 3.0},
+		},
+		{
+			Expression: `$eval("10 + 32")`,
+			Output:     42.0,
+		},
+		{
+			// ensure default context is picked up
+			Expression: `$eval("Account.Order.OrderID")`,
+			Output:     []any{"order103", "order104"},
+		},
+		{
+			// ensure context can be overridden
+			Expression: `$eval("Order.OrderID", Account)`,
+			Output:     []any{"order103", "order104"},
+		},
+		{
+			// ensure context can be overridden
+			Expression: `$eval("a+b", {"a":8.4, "b": 33.6})`,
+			Output:     42.0,
+		},
+	})
+}
