@@ -44,7 +44,7 @@ func IsNumber(v reflect.Value) bool {
 func IsCallable(v reflect.Value) bool {
 	v = Resolve(v)
 	return v.IsValid() &&
-		(v.Type().Implements(TypeCallable) || reflect.PtrTo(v.Type()).Implements(TypeCallable))
+		(v.Type().Implements(TypeCallable) || reflect.PointerTo(v.Type()).Implements(TypeCallable))
 }
 
 // IsArray (golint)
@@ -128,7 +128,7 @@ func AsCallable(v reflect.Value) (Callable, bool) {
 		return v.Interface().(Callable), true
 	}
 
-	if v.IsValid() && reflect.PtrTo(v.Type()).Implements(TypeCallable) && v.CanAddr() && v.Addr().CanInterface() {
+	if v.IsValid() && reflect.PointerTo(v.Type()).Implements(TypeCallable) && v.CanAddr() && v.Addr().CanInterface() {
 		return v.Addr().Interface().(Callable), true
 	}
 

@@ -381,3 +381,29 @@ func isLetter(r rune) bool {
 func isDigit(r rune) bool {
 	return (r >= '0' && r <= '9') || unicode.IsDigit(r)
 }
+
+type (
+	// need this indirection to avoid an initialization cycle with DoEval.
+	evali interface {
+		doEval(reflect.Value, string) (any, error)
+	}
+	evalc struct{}
+)
+
+// DoEval supports $eval(script, [context])
+func DoEval(ctx reflect.Value, s string, sub jtypes.OptionalValue) (any, error) {
+	// replace the context if the optional second argument is provided.
+	if sub.IsSet() {
+		ctx = sub.Value
+	}
+	var e evali = evalc{}
+	return e.doEval(ctx, s)
+}
+
+func (evalc) doEval(ctx reflect.Value, s string) (any, error) {
+	expr, err := Compile(s)
+	if err != nil {
+		return nil, err
+	}
+	return expr.Eval(ctx)
+}

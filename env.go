@@ -179,6 +179,11 @@ var standardFunctions = map[string]Extension{
 		UndefinedHandler:   defaultUndefinedHandler,
 		EvalContextHandler: defaultContextHandler,
 	},
+	"eval": {
+		Func:               DoEval,
+		UndefinedHandler:   nil,
+		EvalContextHandler: func([]reflect.Value) bool { return true },
+	},
 
 	// Number functions
 

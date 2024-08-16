@@ -48,7 +48,7 @@ func newGoCallableParam(typ reflect.Type) goCallableParam {
 		t: typ,
 	}
 
-	isOpt := reflect.PtrTo(typ).Implements(jtypes.TypeOptional)
+	isOpt := reflect.PointerTo(typ).Implements(jtypes.TypeOptional)
 	if isOpt {
 		o := reflect.New(typ).Interface().(jtypes.Optional)
 		p := newGoCallableParam(o.Type())
@@ -294,7 +294,7 @@ func (c *goCallable) validateArgTypes(argv []reflect.Value) ([]reflect.Value, er
 		// This is fine for most types but we need to restore
 		// pointer type Callables.
 		if v.Kind() == reflect.Struct &&
-			reflect.PtrTo(v.Type()).Implements(jtypes.TypeCallable) {
+			reflect.PointerTo(v.Type()).Implements(jtypes.TypeCallable) {
 			if v.CanAddr() {
 				v = v.Addr()
 			}
